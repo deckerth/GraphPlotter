@@ -3,12 +3,314 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:MathEvaluatorTest"
+    xmlns:converter="using:MathEvaluatorTest.ValueConverters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
+    <Page.Resources>
+        <converter:BooleanToVisibilityConverter x:Key="booleanVisConverter" />
+        <converter:BooleanToBrushConverter x:Key="booleanBrushConverter"/>
+    </Page.Resources>
 
-    </Grid>
+    <RelativePanel>
+        <TextBox x:Name="Expression" Header="{x:Bind ViewModel.FxHeader,Mode=OneWay}" 
+                 Text="{x:Bind ViewModel.Expression,Mode=TwoWay}"
+                 Foreground="{x:Bind ViewModel.ExpressionIsValid,Converter={StaticResource booleanBrushConverter},Mode=OneWay}"
+                 Width="400"
+                 RelativePanel.AlignLeftWithPanel="True"
+                 RelativePanel.AlignTopWithPanel="True" Margin="10,10,0,0"/>
+
+        <ToggleSwitch x:Name="Mode3D"
+                 Margin="20,10,0,0"
+                 RelativePanel.RightOf="Expression"
+                 RelativePanel.AlignTopWithPanel="True"
+                 OnContent="3D"
+                 OffContent="2D"
+                 IsOn="{x:Bind ViewModel.Mode3D, Mode=TwoWay}" Width="100"                      
+                 />
+
+        <AppBarButton x:Name="MenuButton"
+                      Icon="More"
+                      RelativePanel.AlignRightWithPanel="True"
+                      RelativePanel.AlignTopWithPanel="True">
+            <AppBarButton.Flyout>
+                <MenuFlyout>
+                    <MenuFlyoutItem x:Uid="Settings" Command="{x:Bind ViewModel.ShowSettingsDialogCommand,Mode=OneTime}"/>
+                    <MenuFlyoutItem x:Uid="About" Command="{x:Bind ViewModel.ShowAboutDialogCommand,Mode=OneTime}"/>
+                </MenuFlyout>
+            </AppBarButton.Flyout>
+        </AppBarButton>
+
+        <Grid x:Name="GraphArea"
+             RelativePanel.AlignLeftWithPanel="True"
+             RelativePanel.AlignRightWithPanel="True"
+             RelativePanel.Below="Expression"
+             RelativePanel.AlignBottomWithPanel="True"
+             Margin="10,10,0,30"
+             >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Column="0" Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="Min" x:Uid="Min" 
+                 Grid.Column="0"
+                 Text="{x:Bind ViewModel.Min,Mode=TwoWay}"
+                 Margin="10,0,0,10" 
+                 InputScope="Number"/>
+
+                <TextBox x:Name="Max" x:Uid="Max"
+                 Grid.Column="1"
+                 Text="{x:Bind ViewModel.Max,Mode=TwoWay}"
+                 Margin="10,0,0,10"
+                 InputScope="Number"/>
+
+                <TextBox x:Name="MinY" x:Uid="MinY"
+                 Grid.Column="2"
+                 Text="{x:Bind ViewModel.MinY,Mode=TwoWay}"
+                 Visibility="{x:Bind ViewModel.Mode3D, Converter={StaticResource booleanVisConverter}, Mode=OneWay}"
+                 Margin="10,0,0,10" 
+                 InputScope="Number"/>
+
+                <TextBox x:Name="MaxY" x:Uid="MaxY" 
+                 Grid.Column="3"
+                 Text="{x:Bind ViewModel.MaxY,Mode=TwoWay}"
+                 Visibility="{x:Bind ViewModel.Mode3D, Converter={StaticResource booleanVisConverter}, Mode=OneWay}"
+                 Margin="10,0,0,10"
+                 InputScope="Number"/>
+
+                <TextBox x:Name="NPoints" Header="n"
+                 Grid.Column="4"
+                 Text="{x:Bind ViewModel.N,Mode=TwoWay}"
+                 Visibility="{x:Bind ViewModel.Mode3D, Converter={StaticResource booleanVisConverter}, Mode=OneWay}"
+                 Margin="10,0,0,10"
+                 InputScope="Number"/>
+
+                <CommandBar x:Name="LeftCommandBar" VerticalAlignment="Bottom" 
+                            Grid.Column="5"
+                            Margin="10,10,0,10" Width="Auto"
+                            OverflowButtonVisibility="Visible"
+                            IsDynamicOverflowEnabled="True">
+                    <AppBarButton x:Name="Plot" x:Uid="Plot"
+                                  AllowFocusOnInteraction="True"
+                Command="{x:Bind ViewModel.PlotCommand}"
+                IsEnabled="{x:Bind ViewModel.ExpressionIsValid,Mode=OneWay}"
+                Margin="10,0,0,0"
+                >
+                        <AppBarButton.Icon>
+                            <PathIcon Data="F0 M0 0L0 15L0.714286 15L0.714286 7.85714L7.64509 7.85714L7.38839 7.14286L1.5067 7.14286C1.57506 6.77874 1.68666 6.22768 1.89732 5.44643C2.21401 4.26897 2.70368 2.85156 3.29241 1.96429C3.58677 1.52065 3.90206 1.22349 4.18527 1.11607C4.46847 1.00865 4.73354 1.03376 5.13393 1.33929C5.93331 1.95034 7.0466 3.81557 8.27009 7.61161C9.51172 11.4607 10.6138 13.4235 11.7522 14.2411C12.3214 14.6498 12.9478 14.7391 13.4821 14.5536C14.0165 14.368 14.4503 13.9593 14.8326 13.4487C15.5957 12.4275 16.1523 10.9668 16.5402 9.75447C16.8429 8.80859 16.995 8.16127 17.0647 7.85714L17.8571 7.85714L17.8571 7.14286L9.60938 7.14286L9.82143 7.85714L16.3393 7.85714C16.2486 8.23103 16.1021 8.78209 15.8594 9.54241C15.4827 10.7185 14.9289 12.1233 14.2634 13.0134C13.9314 13.4584 13.5756 13.7709 13.2478 13.8839C12.9199 13.9969 12.6046 13.969 12.1763 13.6607C11.3198 13.0455 10.1744 11.183 8.95089 7.38839C7.71066 3.54213 6.64481 1.5918 5.5692 0.770089C5.29994 0.565011 5.01116 0.431082 4.73214 0.379464C4.45313 0.327846 4.18108 0.350168 3.92857 0.446429C3.42494 0.637556 3.02874 1.06166 2.68973 1.57366C2.01032 2.59626 1.53181 4.04576 1.20536 5.2567C0.957031 6.18164 0.830078 6.82199 0.770089 7.14286L0.714286 7.14286L0.714286 0L0 0Z" />
+                        </AppBarButton.Icon>
+                    </AppBarButton>
+
+                    <AppBarButton x:Name="Enlarge" x:Uid="Enlarge" Icon="ZoomIn"
+                Command="{x:Bind ViewModel.EnlargeCommand}"
+                IsEnabled="{x:Bind ViewModel.IsExpressionDefined,Mode=OneWay}"
+                />
+
+                    <AppBarButton x:Name="Shrink" x:Uid="Shrink" Icon="ZoomOut"
+                Command="{x:Bind ViewModel.ShrinkCommand}"
+                IsEnabled="{x:Bind ViewModel.IsExpressionDefined,Mode=OneWay}"
+                />
+
+                    <AppBarButton x:Name="FindRoots" x:Uid="FindRoots"
+                IsEnabled="{x:Bind converter:BooleanOperator.OpAnd(ViewModel.IsExpressionDefined, ViewModel.AreaSelectionValid),Mode=OneWay}"
+                Command="{x:Bind ViewModel.FindRootCommand,Mode=OneWay}"
+                >
+                        <AppBarButton.Icon>
+                            <PathIcon Data="F0 M8 16 C14 11 16 0 16 0 h1 C14 11 9 16 9 16 h-1 M0,7 h30 v1 h-30 v-1 M2,6 v-6 h5 v2 h-3 v4 h-1 M2,9 v6 h5 v-2 h-3 v-4 h-1 M27,6  v-6 h-5 v2  h3  v4  h2  M27,9 v6 h-5   v-2  h3  v-4 
+h2 "/>
+                        </AppBarButton.Icon>
+                    </AppBarButton>
+                </CommandBar>
+            </Grid>
+
+            <Grid Grid.Column="2" Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="MinDetail" x:Uid="Min"
+                 Grid.Column="0"
+                 Text="{x:Bind ViewModel.DetailViewModel.Min,Mode=TwoWay}"
+                 Margin="10,0,0,10" 
+                 InputScope="Number"/>
+
+                <TextBox x:Name="MaxDetail" x:Uid="Max"
+                 Grid.Column="1"
+                 Text="{x:Bind ViewModel.DetailViewModel.Max,Mode=TwoWay}"
+                 Margin="10,0,0,10"
+                 InputScope="Number"/>
+
+                <CommandBar x:Name="DetailCommandBar" VerticalAlignment="Bottom" 
+                            Grid.Column="5"
+                            Margin="10,10,0,10" Width="Auto"
+                            OverflowButtonVisibility="Visible"
+                            IsDynamicOverflowEnabled="True">
+
+                    <AppBarButton x:Name="EnlargeDetail" x:Uid="Enlarge" Icon="ZoomIn"
+                Command="{x:Bind ViewModel.DetailViewModel.EnlargeCommand}"
+                IsEnabled="{x:Bind ViewModel.DetailViewModel.IsExpressionDefined,Mode=OneWay}"
+                />
+
+                    <AppBarButton x:Name="ShrinkDetail" x:Uid="Shrink" Icon="ZoomOut"
+                Command="{x:Bind ViewModel.DetailViewModel.ShrinkCommand}"
+                IsEnabled="{x:Bind ViewModel.DetailViewModel.IsExpressionDefined,Mode=OneWay}"
+                />
+
+                    <AppBarButton x:Name="FindRootsDetail" x:Uid="FindRoots"
+                IsEnabled="{x:Bind converter:BooleanOperator.OpAnd(ViewModel.DetailViewModel.IsExpressionDefined, ViewModel.DetailViewModel.AreaSelectionValid),Mode=OneWay}"
+                Command="{x:Bind ViewModel.DetailViewModel.FindRootCommand,Mode=OneWay}"
+                >
+                        <AppBarButton.Icon>
+                            <PathIcon Data="F0 M8 16 C14 11 16 0 16 0 h1 C14 11 9 16 9 16 h-1 M0,7 h30 v1 h-30 v-1 M2,6 v-6 h5 v2 h-3 v4 h-1 M2,9 v6 h5 v-2 h-3 v-4 h-1 M27,6  v-6 h-5 v2  h3  v4  h2  M27,9 v6 h-5   v-2  h3  v-4 
+h2 "/>
+                        </AppBarButton.Icon>
+                    </AppBarButton>
+                </CommandBar>
+            </Grid>
+
+            <Border x:Name="PlottingArea" Grid.Column="0" Grid.Row="1"
+                        BorderThickness="1,1,1,1" 
+                        BorderBrush="Red">
+                <Canvas x:Name="PlotCanvas" 
+                        Height="{x:Bind PlottingArea.Height, Mode=OneWay}"
+                        Width="{x:Bind PlottingArea.Width, Mode=OneWay}" 
+                        Background="#00000000">
+                    <Canvas.Clip>
+                        <RectangleGeometry Rect="0 0 800 400"/>
+                    </Canvas.Clip>
+                </Canvas>
+            </Border>
+
+            <Slider x:Name="AlphaSlider" Grid.Column="1" Grid.Row="1"
+                Orientation="Vertical"
+                VerticalAlignment="Center"
+                Height="200"
+                Minimum="0"
+                Maximum="360"                
+                Value="{x:Bind ViewModel.AspectAlpha, Mode=TwoWay}"
+                Visibility="{x:Bind converter:BooleanOperator.OpAndToVis(ViewModel.Mode3D, ViewModel.IsExpressionDefined),Mode=OneWay}"
+                TickFrequency="30" TickPlacement="Outside" 
+                LargeChange="100" SmallChange="10" StepFrequency="10" 
+                FontFamily="Segoe UI" FontSize="18" FontStyle="Normal" 
+                Header="  α" Margin="10,0,10,0">
+            </Slider>
+
+            <Border x:Name="PlottingArea2DDetail" Grid.Column="2" Grid.Row="1"
+                        BorderThickness="1,1,1,1" 
+                        BorderBrush="Red"
+                        Margin="10,0,10,0">
+                <Canvas x:Name="PlotCanvas2DDetail" 
+                        Height="{x:Bind PlottingArea2DDetail.Height, Mode=OneWay}"
+                        Width="{x:Bind PlottingArea2DDetail.Width, Mode=OneWay}" 
+                        Background="#00000000">
+                    <Canvas.Clip>
+                        <RectangleGeometry Rect="0 0 800 400"/>
+                    </Canvas.Clip>
+                </Canvas>
+            </Border>
+
+            <RelativePanel x:Name="ValuesMain" Grid.Column="0" Grid.Row="2">
+                <TextBlock x:Name="XLabel" Text="x = "
+                   Visibility="{x:Bind ViewModel.Mode3D, Converter={StaticResource booleanVisConverter}, ConverterParameter=True, Mode=OneWay}"
+                   RelativePanel.AlignLeftWithPanel="True"
+                   RelativePanel.Above="XYChooser" Margin="10,0,0,30"/>
+
+                <TextBox x:Name="XValue" 
+                 Visibility="{x:Bind ViewModel.Mode3D, Converter={StaticResource booleanVisConverter}, ConverterParameter=True, Mode=OneWay}"
+                 Text="{x:Bind ViewModel.XValue,Mode=TwoWay}"
+                 Width="200"
+                 RelativePanel.RightOf="XLabel"
+                 RelativePanel.Above="XYChooser" Margin="10,0,0,20" 
+                 />
+
+                <TextBlock x:Name="FxLabel" Text="f(x) = "
+                 Visibility="{x:Bind ViewModel.Mode3D, Converter={StaticResource booleanVisConverter}, ConverterParameter=True, Mode=OneWay}"
+                 RelativePanel.RightOf="XValue"
+                 RelativePanel.Above="XYChooser" Margin="10,0,0,30"/>
+
+                <TextBox x:Name="FxValue" 
+                 Visibility="{x:Bind ViewModel.Mode3D, Converter={StaticResource booleanVisConverter}, ConverterParameter=True, Mode=OneWay}"
+                 Text="{x:Bind ViewModel.FxValue,Mode=OneWay}"
+                 IsEnabled="False"
+                 Width="200"
+                 RelativePanel.RightOf="FxLabel"
+                 RelativePanel.Above="XYChooser" Margin="10,0,0,20"/>
+
+                <ToggleSwitch x:Name="XYChooser"
+                   Visibility="{x:Bind ViewModel.Mode3D, Converter={StaticResource booleanVisConverter}, Mode=OneWay}"
+                   RelativePanel.AlignLeftWithPanel="True"
+                   RelativePanel.AlignBottomWithPanel="True" Margin="10,0,0,10"
+                   OnContent="x = "
+                   OffContent="y = "
+                   IsOn="{x:Bind ViewModel.XMode, Mode=TwoWay}" Width="100"                      
+                   />
+
+                <TextBox x:Name="XYValue" 
+                 Visibility="{x:Bind ViewModel.Mode3D, Converter={StaticResource booleanVisConverter}, Mode=OneWay}"
+                 Text="{x:Bind ViewModel.XYValue,Mode=TwoWay}"
+                 IsEnabled="False"
+                 Width="200"
+                 RelativePanel.RightOf="XYChooser"
+                 RelativePanel.AlignVerticalCenterWith="XYChooser" Margin="0,0,0,10" RelativePanel.AlignBottomWith=""/>
+
+            </RelativePanel>
+
+            <RelativePanel x:Name="ValuesDetail" Grid.Column="2" Grid.Row="2">
+                <TextBlock x:Name="ConstantValueLabel" Text="{x:Bind ViewModel.ConstantValueHeader, Mode=OneWay}"
+                   RelativePanel.AlignLeftWithPanel="True"
+                   RelativePanel.AlignTopWithPanel="True" 
+                   Margin="10,15,0,0"/>
+                <TextBox x:Name="ConstantValue" Text="{x:Bind ViewModel.DetailViewModel.XYValue, Mode=OneWay}"
+                           IsEnabled="False"
+                           Width="150"
+                           RelativePanel.AlignTopWithPanel="True"
+                           RelativePanel.RightOf="ConstantValueLabel" Margin="35,10,0,0"/>
+
+                <TextBlock x:Name="PositionLabel" Text="{x:Bind ViewModel.DetailPositionHeader, Mode=OneWay}"
+                           RelativePanel.RightOf="ConstantValue"
+                           RelativePanel.AlignTopWithPanel="True" 
+                           Margin="10,15,0,0"/>
+                <TextBox x:Name="Position" Text="{x:Bind ViewModel.DetailViewModel.XValue, Mode=TwoWay}"
+                           Width="150"
+                           RelativePanel.AlignTopWithPanel="True"
+                           RelativePanel.RightOf="PositionLabel" Margin="10,10,0,0"/>
+
+                <TextBlock x:Name="FxyLabel" Text="f(x, y) = "
+                           RelativePanel.AlignLeftWithPanel="True"
+                           RelativePanel.Below="ConstantValue" Margin="10,15,0,0"/>
+
+                <TextBox x:Name="ZValue" 
+                           Text="{x:Bind ViewModel.DetailViewModel.FxValue,Mode=OneWay}"
+                           IsEnabled="False"
+                           Width="150"
+                           RelativePanel.RightOf="FxyLabel"
+                           RelativePanel.Below="ConstantValue" Margin="10,10,0,0"/>
+
+            </RelativePanel>
+        </Grid>
+
+
+    </RelativePanel>
 </Page>

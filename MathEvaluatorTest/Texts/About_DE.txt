@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <div style="font-family:'Segoe UI'; font-size:medium;" >
+<p>&nbsp;</p>
+<table>
+<tbody>
+<tr>
+<td><span style="background-color: #ffffff; color: #000000; font-family: Verdana,Arial,Helvetica,sans-serif; font-size: 14px; font-style: normal; font-variant: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: left; text-decoration: none; text-indent: 0px; text-transform: none; -webkit-text-stroke-width: 0px; white-space: normal; word-spacing: 0px;">&copy;</span></td>
+<td><span style="background-color: #ffffff; color: #000000; font-family: Verdana,Arial,Helvetica,sans-serif; font-size: 14px; font-style: normal; font-variant: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: left; text-decoration: none; text-indent: 0px; text-transform: none; -webkit-text-stroke-width: 0px; white-space: normal; word-spacing: 0px;">2019 Thomas Decker</span></td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+<td><span style="background-color: #ffffff; color: #000000; font-family: Verdana,Arial,Helvetica,sans-serif; font-size: 14px; font-style: normal; font-variant: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: left; text-decoration: none; text-indent: 0px; text-transform: none; -webkit-text-stroke-width: 0px; white-space: normal; word-spacing: 0px;">deckerth@gmail.com</span></td>
+</tr>
+</tbody>
+</table>
+<p>Das App-Icon wurde von Khalid Djataou erstellt und ist unter der&nbsp;<a href="https://creativecommons.org/licenses/by/3.0/"> Creative Commons License</a> lizensiert.</p>
+<p>&nbsp;</p>
+<p><span style="background-color: #ffffff;">&nbsp;</span></p>
+    </div>
+</body>
+</html>
